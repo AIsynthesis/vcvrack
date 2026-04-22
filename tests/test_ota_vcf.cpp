@@ -5,6 +5,7 @@
 
 static constexpr float kSampleRate  = 48000.f;
 static constexpr int   kNumSamples  = 4800;   // 100ms of audio
+static constexpr float kPi = 3.14159265358979f;
 
 static float rms(const float* buf, int n) {
     float sum = 0.f;
@@ -13,7 +14,7 @@ static float rms(const float* buf, int n) {
 }
 
 static float sine_sample(float freq_hz, int i) {
-    return std::sin(2.f * 3.14159265f * freq_hz * static_cast<float>(i) / kSampleRate);
+    return std::sin(2.f * kPi * freq_hz * static_cast<float>(i) / kSampleRate);
 }
 
 // LP mode: 100Hz signal through 1kHz-cutoff filter should pass with minimal attenuation.
@@ -23,7 +24,7 @@ static void test_lp_passes_low_freq() {
     for (int i = 0; i < kNumSamples; ++i)
         out[i] = vcf.process(sine_sample(100.f, i), 1000.f, 0.f, kSampleRate, OtaVcf::Mode::LP);
     float amplitude = rms(out + kNumSamples / 2, kNumSamples / 2);  // skip transient
-    assert(amplitude > 0.3f);
+    assert(amplitude > 0.6f);
     printf("PASS: LP passes low frequency (rms=%.3f)\n", amplitude);
 }
 
@@ -37,6 +38,7 @@ static void test_lp_attenuates_high_freq() {
     }
     float hi = rms(out_hi + kNumSamples / 2, kNumSamples / 2);
     float lo = rms(out_lo + kNumSamples / 2, kNumSamples / 2);
+    assert(lo > 0.5f);
     assert(hi < lo * 0.4f);
     printf("PASS: LP attenuates high frequency (hi_rms=%.3f lo_rms=%.3f)\n", hi, lo);
 }
@@ -48,6 +50,7 @@ static void test_hp_attenuates_low_freq() {
     for (int i = 0; i < kNumSamples; ++i)
         out[i] = vcf.process(sine_sample(100.f, i), 1000.f, 0.f, kSampleRate, OtaVcf::Mode::HP);
     float amplitude = rms(out + kNumSamples / 2, kNumSamples / 2);
+    assert(amplitude > 0.001f);
     assert(amplitude < 0.3f);
     printf("PASS: HP attenuates low frequency (rms=%.3f)\n", amplitude);
 }
@@ -59,7 +62,7 @@ static void test_hp_passes_high_freq() {
     for (int i = 0; i < kNumSamples; ++i)
         out[i] = vcf.process(sine_sample(8000.f, i), 1000.f, 0.f, kSampleRate, OtaVcf::Mode::HP);
     float amplitude = rms(out + kNumSamples / 2, kNumSamples / 2);
-    assert(amplitude > 0.3f);
+    assert(amplitude > 0.6f);
     printf("PASS: HP passes high frequency (rms=%.3f)\n", amplitude);
 }
 
@@ -73,6 +76,12 @@ static void test_self_oscillation() {
     for (int i = 0; i < kNumSamples; ++i)
         out[i] = vcf.process(0.f, 1000.f, 1.0f, kSampleRate, OtaVcf::Mode::LP);
     float amplitude = rms(out, kNumSamples);
+    float min_val = out[0], max_val = out[0];
+    for (int i = 1; i < kNumSamples; ++i) {
+        if (out[i] < min_val) min_val = out[i];
+        if (out[i] > max_val) max_val = out[i];
+    }
+    assert(max_val - min_val > 0.01f);  // ensure oscillation, not just DC bias
     assert(amplitude > 0.01f);
     printf("PASS: Self-oscillation at max resonance (rms=%.4f)\n", amplitude);
 }
@@ -87,6 +96,15 @@ static void test_no_nan_inf() {
         assert(!std::isnan(y) && !std::isinf(y));
     }
     printf("PASS: No NaN/Inf produced\n");
+
+    // Stress: max resonance + large input — the saturation path must remain stable
+    OtaVcf vcf2;
+    for (int i = 0; i < 1000; ++i) {
+        float in = (i % 2 == 0) ? 10.f : -10.f;
+        float y  = vcf2.process(in, 1000.f, 1.0f, kSampleRate, OtaVcf::Mode::LP);
+        assert(!std::isnan(y) && !std::isinf(y));
+    }
+    printf("PASS: No NaN/Inf at max resonance with large input\n");
 }
 
 int main() {

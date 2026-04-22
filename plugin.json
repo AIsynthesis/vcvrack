@@ -1,0 +1,23 @@
+{
+    "slug": "AISynthesis",
+    "name": "AI Synthesis",
+    "version": "1.0.0",
+    "license": "GPL-3.0-or-later",
+    "brand": "AI Synthesis",
+    "author": "AI Synthesis",
+    "authorEmail": "",
+    "authorUrl": "",
+    "pluginUrl": "",
+    "manualUrl": "",
+    "sourceUrl": "",
+    "donateUrl": "",
+    "changelogUrl": "",
+    "modules": [
+        {
+            "slug": "AI004_OTA_VCF",
+            "name": "AI004 OTA VCF",
+            "description": "MS-20 style OTA voltage controlled filter",
+            "tags": ["Filter", "Lowpass filter", "Highpass filter"]
+        }
+    ]
+}

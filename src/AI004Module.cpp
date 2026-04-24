@@ -64,6 +64,7 @@ struct AI004Module : rack::Module {
 
 private:
     // CV is 1V/oct: adding CV voltage (scaled by CV Amount) to log2(fc) shifts cutoff by octaves.
+    // Non-const: rack::Param::getValue() and Port::getVoltage() are non-const in Rack v2 SDK.
     float computeCutoffHz() {
         float log2_fc = params[CUTOFF_PARAM].getValue();
         float cv_v    = inputs[CV_IN].getVoltage();

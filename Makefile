@@ -3,7 +3,7 @@
 RACK_DIR ?= ../Rack
 
 SLUG = AISynthesis
-VERSION = 1.0.0
+VERSION = 2.0.0
 
 FLAGS += -std=c++17
 SOURCES += src/plugin.cpp src/AI004Module.cpp

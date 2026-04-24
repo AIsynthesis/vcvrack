@@ -54,8 +54,11 @@ public:
         // First integrator: OTA transconductance with soft saturation models overload.
         bp_ += g * softSaturate(hp);
 
-        // Second integrator: pure LP stage, bounded by bp saturation.
-        lp_ += g * bp_;
+        // Second integrator: LP stage with soft ceiling to prevent state runaway
+        // during self-oscillation. Ceiling at 15V is well above normal VCV Rack
+        // signal levels (+-5V), so passband signals pass with negligible saturation.
+        float lp_next = lp_ + g * bp_;
+        lp_ = 15.f * std::tanh(lp_next * (1.f / 15.f));
 
         return (mode == Mode::LP) ? lp_ : hp;
     }

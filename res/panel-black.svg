@@ -5,10 +5,10 @@
   <!-- Panel background: black -->
   <rect width="40.64" height="128.5" fill="#111111"/>
   <!-- Mounting holes -->
-  <circle cx="7.62"  cy="7.62"   r="3.5" fill="#222"/>
-  <circle cx="33.02" cy="7.62"   r="3.5" fill="#222"/>
-  <circle cx="7.62"  cy="120.88" r="3.5" fill="#222"/>
-  <circle cx="33.02" cy="120.88" r="3.5" fill="#222"/>
+  <circle cx="7.62"  cy="7.62"   r="1.6" fill="#222"/>
+  <circle cx="33.02" cy="7.62"   r="1.6" fill="#222"/>
+  <circle cx="7.62"  cy="120.88" r="1.6" fill="#222"/>
+  <circle cx="33.02" cy="120.88" r="1.6" fill="#222"/>
   <!-- Module title -->
   <text x="20.32" y="17" text-anchor="middle"
         font-family="sans-serif" font-size="5" font-weight="bold" fill="#ffffff">AI004</text>

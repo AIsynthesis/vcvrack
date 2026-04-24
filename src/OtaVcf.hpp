@@ -10,7 +10,7 @@
 //   lp += g * bp                                   (lowpass integrator)
 //
 // LP output: lp (12dB/oct).
-// HP output: hp node (12dB/oct).
+// HP output: in - hp_lp_ (6dB/oct, one-pole, per spec).
 //
 // SVF topology with diode saturation in the damping term models MS-20 resonance.
 // At resonance=1.0, effective damping goes slightly negative (kExtraDrive > 0),
@@ -25,10 +25,9 @@ public:
     OtaVcf() { reset(); }
 
     void reset() {
-        bp_ = 0.f;
-        // Tiny seed breaks the zero equilibrium so resonance rings up from rest.
-        // Models the thermal noise floor of the OTA hardware.
-        lp_ = 1e-6f;
+        bp_    = 0.f;
+        lp_    = 1e-6f;  // tiny seed breaks zero equilibrium for self-oscillation ring-up
+        hp_lp_ = 0.f;
     }
 
     // Process one audio sample.
@@ -36,10 +35,16 @@ public:
     //   cutoff_hz   -- cutoff frequency in Hz, clamped to [20, 20000]
     //   resonance   -- 0..1; self-oscillation begins around 0.8
     //   sample_rate -- host sample rate in Hz
-    //   mode        -- LP (12dB/oct output) or HP (12dB/oct output)
+    //   mode        -- LP (12dB/oct output) or HP (6dB/oct output, one-pole)
     float process(float in, float cutoff_hz, float resonance,
                   float sample_rate, Mode mode) {
         float g = computeG(cutoff_hz, sample_rate);
+
+        // One-pole HP section: always runs for state continuity on mode switches.
+        // HP output = in - hp_lp_ gives 6dB/oct slope per spec.
+        float gn = g / (1.f + g);
+        hp_lp_ += gn * (in - hp_lp_);
+
         // R is damping: 1.0 = critically damped, 0.0 = onset of self-oscillation.
         // kExtraDrive pushes R slightly past zero at full resonance so the filter
         // becomes unstable and rings up from the 1e-6 noise seed.
@@ -60,7 +65,7 @@ public:
         float lp_next = lp_ + g * bp_;
         lp_ = 15.f * std::tanh(lp_next * (1.f / 15.f));
 
-        return (mode == Mode::LP) ? lp_ : hp;
+        return (mode == Mode::LP) ? lp_ : (in - hp_lp_);
     }
 
 private:
@@ -69,8 +74,9 @@ private:
     static constexpr float kDiodePos   = 1.4f;  // harder clip on positive half
     static constexpr float kDiodeNeg   = 0.8f;  // softer clip on negative half
 
-    float bp_ = 0.f;  // bandpass integrator state
-    float lp_ = 0.f;  // lowpass integrator state
+    float bp_    = 0.f;    // bandpass integrator state
+    float lp_    = 1e-6f;  // lowpass integrator state (seeded for self-oscillation ring-up)
+    float hp_lp_ = 0.f;    // one-pole LP for HP output path (gives 6dB/oct HP)
 
     // Bilinear-warped frequency coefficient.
     // Clamping fc before tan() prevents instability near Nyquist.

@@ -73,6 +73,75 @@ private:
     }
 };
 
-// modelAI004 is referenced in plugin.cpp — defined here after AI004Widget is added in Task 6.
-// Placeholder so this file compiles independently:
-rack::Model* modelAI004 = nullptr;
+// ─── Widget ────────────────────────────────────────────────────────────────────
+
+struct AI004Widget : rack::ModuleWidget {
+    explicit AI004Widget(AI004Module* module) {
+        setModule(module);
+        setPanel(rack::createPanel(
+            rack::asset::plugin(pluginInstance, "res/panel-aluminum.svg")));
+
+        // Screws at standard 8HP corner positions (mm coordinates)
+        addChild(rack::createWidget<rack::ScrewSilver>(rack::mm2px(rack::Vec( 1.5f,   1.5f))));
+        addChild(rack::createWidget<rack::ScrewSilver>(rack::mm2px(rack::Vec(29.0f,   1.5f))));
+        addChild(rack::createWidget<rack::ScrewSilver>(rack::mm2px(rack::Vec( 1.5f, 117.0f))));
+        addChild(rack::createWidget<rack::ScrewSilver>(rack::mm2px(rack::Vec(29.0f, 117.0f))));
+
+        // Knobs — positions match SVG label positions exactly
+        addParam(rack::createParamCentered<rack::RoundBlackKnob>(
+            rack::mm2px(rack::Vec(11.f, 35.f)), module, AI004Module::CUTOFF_PARAM));
+        addParam(rack::createParamCentered<rack::RoundBlackKnob>(
+            rack::mm2px(rack::Vec(29.f, 35.f)), module, AI004Module::RESONANCE_PARAM));
+        addParam(rack::createParamCentered<rack::RoundBlackKnob>(
+            rack::mm2px(rack::Vec(11.f, 68.f)), module, AI004Module::CVAMT_PARAM));
+
+        // LP/HP two-position toggle switch
+        addParam(rack::createParamCentered<rack::CKSS>(
+            rack::mm2px(rack::Vec(27.f, 69.f)), module, AI004Module::LPSWITCH_PARAM));
+
+        // Jacks
+        addInput(rack::createInputCentered<rack::PJ301MPort>(
+            rack::mm2px(rack::Vec( 8.f,   102.f)), module, AI004Module::AUDIO_IN));
+        addInput(rack::createInputCentered<rack::PJ301MPort>(
+            rack::mm2px(rack::Vec(20.32f, 102.f)), module, AI004Module::CV_IN));
+        addOutput(rack::createOutputCentered<rack::PJ301MPort>(
+            rack::mm2px(rack::Vec(32.f,   102.f)), module, AI004Module::AUDIO_OUT));
+    }
+
+    void step() override {
+        rack::ModuleWidget::step();
+        if (!module) return;
+
+        auto* m = dynamic_cast<AI004Module*>(module);
+        if (!m) return;
+
+        // Reload SVG panel only when skin selection changes — avoids reloading every frame.
+        if (m->panel_skin != last_skin_) {
+            last_skin_ = m->panel_skin;
+            const char* path = (m->panel_skin == 1)
+                ? "res/panel-black.svg"
+                : "res/panel-aluminum.svg";
+            setPanel(rack::createPanel(rack::asset::plugin(pluginInstance, path)));
+        }
+    }
+
+    void appendContextMenu(rack::Menu* menu) override {
+        auto* m = dynamic_cast<AI004Module*>(module);
+        if (!m) return;
+
+        menu->addChild(new rack::MenuSeparator);
+        menu->addChild(rack::createMenuLabel("Panel skin"));
+        menu->addChild(rack::createCheckMenuItem("Aluminum", "",
+            [m] { return m->panel_skin == 0; },
+            [m] { m->panel_skin = 0; }));
+        menu->addChild(rack::createCheckMenuItem("Black", "",
+            [m] { return m->panel_skin == 1; },
+            [m] { m->panel_skin = 1; }));
+    }
+
+private:
+    int last_skin_ = -1;  // tracks last applied skin to avoid reloading SVG every frame
+};
+
+// ─── Model registration ────────────────────────────────────────────────────────
+rack::Model* modelAI004 = rack::createModel<AI004Module, AI004Widget>("AI004_OTA_VCF");

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="40.64mm" height="128.5mm"
+     viewBox="0 0 40.64 128.5">
+  <!-- Panel background: black -->
+  <rect width="40.64" height="128.5" fill="#111111"/>
+  <!-- Mounting holes -->
+  <circle cx="7.62"  cy="7.62"   r="3.5" fill="#222"/>
+  <circle cx="33.02" cy="7.62"   r="3.5" fill="#222"/>
+  <circle cx="7.62"  cy="120.88" r="3.5" fill="#222"/>
+  <circle cx="33.02" cy="120.88" r="3.5" fill="#222"/>
+  <!-- Module title -->
+  <text x="20.32" y="17" text-anchor="middle"
+        font-family="sans-serif" font-size="5" font-weight="bold" fill="#ffffff">AI004</text>
+  <text x="20.32" y="23" text-anchor="middle"
+        font-family="sans-serif" font-size="2.8" fill="#cccccc">OTA VCF</text>
+  <!-- Knob labels -->
+  <text x="11"    y="47" text-anchor="middle" font-family="sans-serif" font-size="2.2" fill="#ffffff">CUTOFF</text>
+  <text x="29"    y="47" text-anchor="middle" font-family="sans-serif" font-size="2.2" fill="#ffffff">RES</text>
+  <text x="11"    y="80" text-anchor="middle" font-family="sans-serif" font-size="2.2" fill="#ffffff">CV AMT</text>
+  <!-- LP/HP switch labels -->
+  <text x="27" y="64" text-anchor="middle" font-family="sans-serif" font-size="2.2" fill="#ffffff">LP</text>
+  <text x="27" y="76" text-anchor="middle" font-family="sans-serif" font-size="2.2" fill="#ffffff">HP</text>
+  <!-- Divider line above jacks -->
+  <line x1="3" y1="90" x2="37.64" y2="90" stroke="#333" stroke-width="0.3"/>
+  <!-- Jack labels -->
+  <text x="8"     y="112" text-anchor="middle" font-family="sans-serif" font-size="2.2" fill="#ffffff">IN</text>
+  <text x="20.32" y="112" text-anchor="middle" font-family="sans-serif" font-size="2.2" fill="#ffffff">CV</text>
+  <text x="32"    y="112" text-anchor="middle" font-family="sans-serif" font-size="2.2" fill="#ffffff">OUT</text>
+</svg>

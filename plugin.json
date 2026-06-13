@@ -14,10 +14,10 @@
     "changelogUrl": "",
     "modules": [
         {
-            "slug": "AI004_OTA_VCF",
-            "name": "AI004 OTA VCF",
-            "description": "MS-20 style OTA voltage controlled filter",
-            "tags": ["Filter", "Lowpass filter", "Highpass filter"]
+            "slug": "AI001_Multiple",
+            "name": "AI001 Multiple",
+            "description": "2HP passive multiple — 8 jacks in two switchable groups",
+            "tags": ["Multiple", "Utility"]
         }
     ]
 }

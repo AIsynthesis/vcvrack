@@ -6,7 +6,7 @@ SLUG = AISynthesis
 VERSION = 2.0.0
 
 FLAGS += -std=c++17
-SOURCES += src/plugin.cpp src/AI004Module.cpp
+SOURCES += src/plugin.cpp src/AI001.cpp
 DISTRIBUTABLES += res plugin.json
 
 include $(RACK_DIR)/plugin.mk

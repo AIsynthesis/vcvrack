@@ -3,10 +3,10 @@
 RACK_DIR ?= ../Rack
 
 SLUG = AISynthesis
-VERSION = 2.0.1
+VERSION = 2.1.0
 
 FLAGS += -std=c++17
-SOURCES += src/plugin.cpp src/AI001.cpp
+SOURCES += src/plugin.cpp src/AI001.cpp src/AI003.cpp src/AI250.cpp src/AI018.cpp
 DISTRIBUTABLES += res plugin.json
 
 include $(RACK_DIR)/plugin.mk
